@@ -5,9 +5,9 @@ from django.shortcuts import render
 # ビュー関数
 def index (request):
     question_list = [
-        "生きている意味は何だ",
-        "お前の住所は何だ",
-        "銀行口座の番号は何だ",
+        "生きている意味は何ですか",
+        "お前の住所は何ですか",
+        "銀行口座の番号は何ですか",
     ]
     context = {
         "question_list": question_list,
@@ -17,3 +17,13 @@ def index (request):
         "user-name":"hello"
     }
     return render(request, "main/index.html",context,)
+
+from  .models import Question
+
+def index(request):
+    all_question = Question.objects.all()
+    context = {
+        "all_question":all_question
+    }
+
+    return render(request,"main/index.html",context)
