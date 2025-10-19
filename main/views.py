@@ -1,24 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 # from django.http import HttpResponse
+from  .models import Question,Choice
 
 # 関数ベースビュー
 # ビュー関数
-def index (request):
-    question_list = [
-        "生きている意味は何ですか",
-        "お前の住所は何ですか",
-        "銀行口座の番号は何ですか",
-    ]
-    context = {
-        "question_list": question_list,
-        "is_polled": True,
-        "polled_msg": "(￣ー￣)((´∀｀))ｹﾗｹﾗ",
-        "not_polled_msg":"(* ´艸｀)ｸｽｸｽ",
-        "user-name":"hello"
-    }
-    return render(request, "main/index.html",context,)
-
-from  .models import Question
 
 def index(request):
     all_question = Question.objects.all()
@@ -27,3 +12,25 @@ def index(request):
     }
 
     return render(request,"main/index.html",context)
+
+def detail(request, question_id):
+    question = Question.objects.get(pk=question_id)
+    context = {
+        "question":question
+    }
+
+    return render(request, "main/detail.html", context)
+
+def vote(request, question_id):
+    question = Question.objects.get(pk=question_id)
+    try:
+        selected_choice = question.choices.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        return render(request, 'main/detail.html',{
+        'question':question,
+        'error_message':"You didn't select a choice",
+        })
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        return redirect("detail", question_id)
